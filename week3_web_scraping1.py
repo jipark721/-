@@ -11,7 +11,7 @@ data = requests.get('https://movie.naver.com/movie/sdb/rank/rmovie.nhn?sel=pnt&d
 soup = BeautifulSoup(data.text, 'html.parser')
 
 #############################
-# (입맛에 맞게 코딩)
+# (입맛에 맞게 코딩) 울라룰라
 #############################
 movies = soup.select('#old_content > table > tbody > tr')
 
@@ -21,5 +21,6 @@ for movie in movies:
     rating = movie.select_one('td.point')
     if a_tag is not None:
         title = a_tag.text
+        rank2 = movie.select('td.ac img')
         rank = movie.select_one('td.ac img')['alt']
         print(rank, title, rating.text)
