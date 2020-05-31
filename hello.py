@@ -17,6 +17,6 @@ print(get_age('지영'))
 #     for fruit in fruits:
 #         if fruit == fruit_name:
 #             count += 1
-#     return count
+#     return count  
 
 # print(count('사과'))

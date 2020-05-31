@@ -6,16 +6,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>스파르타코딩클럽 | 자바스크립트 복습</title>
     <script>
-        let num = 0;
+        let num = 0; //여기서 num은 global var
         function handleClick() {
             num += 1;
-            // 클릭에 따라 다른 얼럿을 띄웁니다.
+            alert();
         }
     </script>
 </head>
 
 <body>
-    <button>이 버튼을 눌러보세요</button>
+    <button onclick="handleClick()">이 버튼을 눌러보세요</button>
 </body>
 
 </html>
