@@ -9,3 +9,5 @@ gus = rjson['RealtimeCityAir']['row']
 for gu in gus:
 	if gu['IDEX_MVL'] < 100:
 		print (gu['MSRSTE_NM'], gu['IDEX_MVL'])
+
+#old_content > table > tbody > tr:nth-child(2) > td:nth-child(1) > img
