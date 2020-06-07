@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Assignment 4 | 쇼핑몰 주문하기</title>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+        integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+        crossorigin="anonymous"></script>
+
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+        integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+        crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+        integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet">
+    <style>
+        * {
+            font-family: 'Jua', sans-serif;
+        }
+
+        .wrap {
+            width: 600px;
+            margin: 30px auto 30px auto;
+        }
+
+        .price {
+            font-size: 20px;
+        }
+
+        .wrap_img {
+            width: 500px;
+            text-align: center;
+        }
+
+        .lead {
+            text-align: center;
+        }
+        
+        .order_button {
+            background-color: blue;
+            color: white;
+            text-align: center;
+            width: 200px;
+            height: 150;
+            padding: 1%;
+        }
+    </style>
+    <script>
+        $(document).ready(function(){
+            $('#currency').empty();
+            $.ajax({
+                type: "GET",
+                url: "https://api.manana.kr/exchange/rate.json",
+                data: {},
+                success: function (response) {
+                    let won_currency = response[1]["rate"];
+                    // 아래 표현도 가능
+                     //`<span>${won_currency}</span>`;
+                     let temp_html ='<span>'+won_currency+'</span>';
+                    $('#currency').append(temp_html);
+                }
+            })
+        });
+
+        function clearOrder() {
+            $('#orderer_name').html("")
+            $('#form_quantity').html("--수량을 선택하세요--")
+            $('#form_address').html("")
+            $('#form_contact').html("")
+            return false;
+        }
+
+        function onOrder() {
+            let orderer = $('#orderer_name').val()
+            let quantity = $('#form_quantity').val()
+            let address = $('#form_address').val()
+            let contact = $('#form_contact').val()
+            if (orderer == "") { //주문자 이름 
+                alert("주문자 이름을 입력해주세요")
+                clearOrder()
+            } else if (quantity == "--수량을 선택하세요--") {
+                alert("수량을 선택해주세요")
+                clearOrder
+            } else if (address == "") {
+                alert("주소를 입력해주세요")
+                clearOrder
+            } else if (contact == "") {
+                alert("연락처를 입력해주세요")
+                clearOrder
+            } else {                
+                $.ajax({
+                type: "POST",
+                url: "/orders",
+                data: { name_give: orderer, quantity_give: quantity, address_give: address, contact_give: contact },
+                success: function (response) {
+                    if (response['result'] == 'success') {
+                        alert(response['msg']);
+                        window.location.reload();
+                    }
+                }
+            })
+            } 
+        }
+
+        $(document).ready(function () {
+            $('#orders-box').html('');
+            show_listing();
+        });
+
+        function show_listing() {
+            $.ajax({
+                type: "GET",
+                url: "/orders",
+                data: {},
+                success: function (response) {
+                    if (response['result'] == 'success') {
+                        let orders = response['orders'];
+                        for (let i = 0; i < orders.length; i++) {
+                            make_card(orders[i]['name'], orders[i]['quantity'], orders[i]['address'], orders[i]['contact']);
+                        }
+                    } else {
+                        alert('오더를 받아오지 못했습니다');
+                    }
+                }
+            })
+        }
+
+        function make_card(name, quantity, address, contact) {
+            let temp_html = `<tr>
+                                <th scope="col">${name}</th>
+                                <th scope="col">${quantity}</th>
+                                <th scope="col">${address}</th>
+                                <th scope="col">${contact}</th>
+                            </tr>`;
+            $('#orders-table').append(temp_html);
+        }
+
+    </script>
+</head>
+
+<body>
+    <div class="wrap">
+        <div class="main">
+            <div class="wrap_img">
+                <img class="img_merchandise"
+                    src="https://postfiles.pstatic.net/MjAyMDA0MjFfMTUy/MDAxNTg3NDM5Njc3Mzk1.7uXJAP6j8IvpDGv1z_v1p7yWv4kLHVL4fQ54aVyMf9Eg.8bXHg2qGQpFgzO9Bu753t72DIpNXQK07FahxSRbnho0g.JPEG.6471kjh/1.jpg?type=w773"
+                    alt="Card image cap">
+            </div>
+            <h1>휴대폰 충전기를 팝니다 <span class="price"> 가격: 39,900원/개</span></h1>
+            <p>귀염뽀짝 라이언에게 휴대폰을 맡기면 충전해줍니다! 충전되는 동안 무드등처럼 빛나는 라이언의 모습에서 덤으로 힐링까지 챙겨가세요~</p>
+        </div>
+        <div>
+            <span>원-달러 환율: </span>
+            <span id = "currency">
+
+            </span>
+        </div>
+        <div class="input-group mb-2 mr-sm-2">
+            <div class="input-group-prepend">
+                <div class="input-group-text">주문자 이름</div>
+            </div>
+            <input type="text" class="form-control" id="orderer_name">
+        </div>
+        <div class="form-group">
+            <div class="input-group-prepend">
+                <div class="input-group-text">수량</div>
+                <select class="form-control" id="form_quantity">
+                    <option>--수량을 선택하세요--</option>
+                    <option>1</option>
+                    <option>2</option>
+                    <option>3</option>
+                    <option>4</option>
+                    <option>5</option>
+                    <option>6</option>
+                    <option>7</option>
+                    <option>8</option>
+                    <option>9</option>
+                    <option>10</option>
+                </select>
+            </div>
+        </div>
+        <div class="input-group mb-2 mr-sm-2">
+            <div class="input-group-prepend">
+                <div class="input-group-text">주소</div>
+            </div>
+            <input type="text" class="form-control" id="form_address">
+        </div>
+        <div class="input-group mb-2 mr-sm-2">
+            <div class="input-group-prepend">
+                <div class="input-group-text">전화번호</div>
+            </div>
+            <input type="text" class="form-control" id="form_contact">
+        </div>
+        <div>
+            <p class="lead">
+                <a onclick="onOrder()" class="btn btn-primary btn-lg" href="#" role="button" class ="order_button">주문하기</a>
+            </p>
+        </div>
+        
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                  <th scope="col">이름</th>
+                  <th scope="col">수량</th>
+                  <th scope="col">주소</th>
+                  <th scope="col">전화번호</th>
+                </tr>
+              </thead>
+            <tbody id="orders-table">
+            </tbody>
+        </table>
+    </div>
+</body>
+
+</html>
